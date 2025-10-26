@@ -124,6 +124,7 @@ export type Database = {
           github_url: string | null
           id: string
           portfolio_url: string | null
+          profile_visibility: string
           role: string
           updated_at: string | null
         }
@@ -135,6 +136,7 @@ export type Database = {
           github_url?: string | null
           id: string
           portfolio_url?: string | null
+          profile_visibility?: string
           role?: string
           updated_at?: string | null
         }
@@ -146,6 +148,7 @@ export type Database = {
           github_url?: string | null
           id?: string
           portfolio_url?: string | null
+          profile_visibility?: string
           role?: string
           updated_at?: string | null
         }
