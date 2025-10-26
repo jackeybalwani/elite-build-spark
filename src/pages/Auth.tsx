@@ -17,7 +17,6 @@ export default function Auth() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
-  const [role, setRole] = useState<"builder" | "sponsor">("builder");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -55,7 +54,6 @@ export default function Auth() {
       options: {
         data: {
           full_name: fullName,
-          role: role,
         },
         emailRedirectTo: `${window.location.origin}/`,
       },
@@ -208,18 +206,6 @@ export default function Auth() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                   />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="role">I am a</Label>
-                  <select
-                    id="role"
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    value={role}
-                    onChange={(e) => setRole(e.target.value as "builder" | "sponsor")}
-                  >
-                    <option value="builder">Builder</option>
-                    <option value="sponsor">Sponsor</option>
-                  </select>
                 </div>
                 <Button
                   type="submit"
