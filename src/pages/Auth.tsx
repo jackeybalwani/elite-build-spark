@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
@@ -17,6 +18,7 @@ export default function Auth() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [role, setRole] = useState<"builder" | "sponsor">("builder");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -54,6 +56,7 @@ export default function Auth() {
       options: {
         data: {
           full_name: fullName,
+          role: role,
         },
         emailRedirectTo: `${window.location.origin}/`,
       },
@@ -206,6 +209,18 @@ export default function Auth() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                   />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="role">I am a</Label>
+                  <Select value={role} onValueChange={(value: "builder" | "sponsor") => setRole(value)}>
+                    <SelectTrigger id="role" className="bg-background">
+                      <SelectValue placeholder="Select your role" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover z-50">
+                      <SelectItem value="builder">Builder - Compete in challenges</SelectItem>
+                      <SelectItem value="sponsor">Sponsor - Create & fund challenges</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <Button
                   type="submit"
