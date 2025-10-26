@@ -1,15 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
-import { Trophy, Code2, User, LogOut } from "lucide-react";
+import { Trophy, Code2, User, LogOut, LayoutDashboard } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
+import { useUserRole } from "@/hooks/useUserRole";
 
 export const Navigation = () => {
   const location = useLocation();
   const { toast } = useToast();
   const [user, setUser] = useState<SupabaseUser | null>(null);
+  const { isSponsor, isAdmin } = useUserRole();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -49,21 +51,43 @@ export const Navigation = () => {
           </Link>
 
           <div className="hidden md:flex items-center space-x-1">
-            <Button
-              variant={isActive("/challenges") ? "default" : "ghost"}
-              asChild
-            >
-              <Link to="/challenges">Challenges</Link>
-            </Button>
-            <Button
-              variant={isActive("/leaderboard") ? "default" : "ghost"}
-              asChild
-            >
-              <Link to="/leaderboard">
-                <Trophy className="mr-2 h-4 w-4" />
-                Leaderboard
-              </Link>
-            </Button>
+            {(isSponsor || isAdmin) ? (
+              <>
+                <Button
+                  variant={isActive("/sponsor-dashboard") ? "default" : "ghost"}
+                  asChild
+                >
+                  <Link to="/sponsor-dashboard">
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    Dashboard
+                  </Link>
+                </Button>
+                <Button
+                  variant={isActive("/challenges") ? "default" : "ghost"}
+                  asChild
+                >
+                  <Link to="/challenges">Challenges</Link>
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  variant={isActive("/challenges") ? "default" : "ghost"}
+                  asChild
+                >
+                  <Link to="/challenges">Challenges</Link>
+                </Button>
+                <Button
+                  variant={isActive("/leaderboard") ? "default" : "ghost"}
+                  asChild
+                >
+                  <Link to="/leaderboard">
+                    <Trophy className="mr-2 h-4 w-4" />
+                    Leaderboard
+                  </Link>
+                </Button>
+              </>
+            )}
           </div>
 
           <div className="flex items-center space-x-2">
