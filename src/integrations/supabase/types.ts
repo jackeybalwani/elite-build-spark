@@ -250,6 +250,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment: { Args: { row_id: string; x: number }; Returns: undefined }
     }
     Enums: {
       app_role: "builder" | "sponsor" | "admin"
