@@ -72,30 +72,60 @@ export const SubmissionsView = () => {
     : submissions.filter(s => s.challenge_id === selectedChallenge);
 
   const downloadCandidatePacket = (submission: any) => {
-    // In production, this would generate a ZIP file
     const packet = {
-      builder: submission.profiles,
-      submission: {
-        repo_url: submission.repo_url,
-        pitch_deck_url: submission.pitch_deck_url,
-        video_url: submission.video_url,
-        score: submission.score,
-        feedback: submission.evaluation_feedback,
-      },
-      challenge: submission.challenges?.title,
+      builderName: submission.profiles?.full_name || 'Unknown',
+      challengeTitle: submission.challenges?.title || 'Unknown',
+      submissionDate: new Date(submission.submitted_at).toLocaleDateString(),
+      repoUrl: submission.repo_url,
+      videoUrl: submission.video_url,
+      pitchDeckUrl: submission.pitch_deck_url,
+      score: submission.score,
+      status: submission.status,
+      evaluationFeedback: submission.evaluation_feedback,
     };
-    
-    const blob = new Blob([JSON.stringify(packet, null, 2)], { type: "application/json" });
+
+    const blob = new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = url;
-    a.download = `candidate-packet-${submission.id}.json`;
+    a.download = `candidate-${submission.user_id}-${Date.now()}.json`;
+    document.body.appendChild(a);
     a.click();
-    
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
     toast({
-      title: "Packet downloaded",
+      title: "Download complete",
       description: "Candidate information has been downloaded",
     });
+  };
+
+  const handleEvaluateSubmission = async (submissionId: string) => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('evaluate-submission', {
+        body: { submissionId }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Evaluation started",
+        description: "The submission is being evaluated by our AI system",
+      });
+
+      // Refresh submissions
+      await fetchData();
+    } catch (error: any) {
+      console.error('Error evaluating submission:', error);
+      toast({
+        title: "Evaluation failed",
+        description: error.message || "Failed to start evaluation",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (loading) {
@@ -188,6 +218,15 @@ export const SubmissionsView = () => {
                             <a href={submission.repo_url} target="_blank" rel="noopener noreferrer">
                               <ExternalLink className="h-4 w-4" />
                             </a>
+                          </Button>
+                        )}
+                        {submission.status === 'pending' && (
+                          <Button
+                            variant="default"
+                            size="sm"
+                            onClick={() => handleEvaluateSubmission(submission.id)}
+                          >
+                            Evaluate
                           </Button>
                         )}
                         <Button
